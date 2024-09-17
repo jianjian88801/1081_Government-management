@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.XinfangdubanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.laifangdengji_id as laifangdengjiId
+        ,a.xinfangduban_uuid_number as xinfangdubanUuidNumber
+        ,a.xinfangduban_biaoti as xinfangdubanBiaoti
+        ,a.xinfangduban_suqiu_content as xinfangdubanSuqiuContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.XinfangdubanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,laifangdengji.yonghu_id as laifangdengjiYonghuId
+        ,laifangdengji.laifangdengji_uuid_number as laifangdengjiUuidNumber
+        ,laifangdengji.laifangdengji_xingming as laifangdengjiXingming
+        ,laifangdengji.laifangdengji_phone as laifangdengjiPhone
+        ,laifangdengji.laifangdengji_suqiu_content as laifangdengjiSuqiuContent
+        ,laifangdengji.laifangdengji_shishi_content as laifangdengjiShishiContent
+        ,laifangdengji.laifangdengji_mudi_types as laifangdengjiMudiTypes
+        ,laifangdengji.laifangdengji_chuli_types as laifangdengjiChuliTypes
+        ,laifangdengji.laifangdengji_chuli_content as laifangdengjiChuliContent
+        ,laifangdengji.chuli_time as chuliTime
+
+        FROM xinfangduban  a
+        left JOIN laifangdengji laifangdengji ON a.laifangdengji_id = laifangdengji.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.laifangdengjiId != null and params.laifangdengjiId != ''">
+                and (
+                    a.laifangdengji_id = #{params.laifangdengjiId}
+                )
+            </if>
+            <if test=" params.xinfangdubanUuidNumber != '' and params.xinfangdubanUuidNumber != null and params.xinfangdubanUuidNumber != 'null' ">
+                and a.xinfangduban_uuid_number like CONCAT('%',#{params.xinfangdubanUuidNumber},'%')
+            </if>
+            <if test=" params.xinfangdubanBiaoti != '' and params.xinfangdubanBiaoti != null and params.xinfangdubanBiaoti != 'null' ">
+                and a.xinfangduban_biaoti like CONCAT('%',#{params.xinfangdubanBiaoti},'%')
+            </if>
+            <if test=" params.xinfangdubanSuqiuContent != '' and params.xinfangdubanSuqiuContent != null and params.xinfangdubanSuqiuContent != 'null' ">
+                and a.xinfangduban_suqiu_content like CONCAT('%',#{params.xinfangdubanSuqiuContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断来访登记的id不为空 -->
+            <if test=" params.laifangdengjiIdNotNull != '' and params.laifangdengjiIdNotNull != null and params.laifangdengjiIdNotNull != 'null' ">
+                and a.laifangdengji_id IS NOT NULL
+            </if>
+            <if test="params.yonghuId != null  and params.yonghuId != ''">
+                and laifangdengji.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.laifangdengjiUuidNumber != '' and params.laifangdengjiUuidNumber != null and params.laifangdengjiUuidNumber != 'null' ">
+                and laifangdengji.laifangdengji_uuid_number like CONCAT('%',#{params.laifangdengjiUuidNumber},'%')
+            </if>
+            <if test=" params.laifangdengjiXingming != '' and params.laifangdengjiXingming != null and params.laifangdengjiXingming != 'null' ">
+                and laifangdengji.laifangdengji_xingming like CONCAT('%',#{params.laifangdengjiXingming},'%')
+            </if>
+            <if test=" params.laifangdengjiPhone != '' and params.laifangdengjiPhone != null and params.laifangdengjiPhone != 'null' ">
+                and laifangdengji.laifangdengji_phone like CONCAT('%',#{params.laifangdengjiPhone},'%')
+            </if>
+            <if test=" params.laifangdengjiSuqiuContent != '' and params.laifangdengjiSuqiuContent != null and params.laifangdengjiSuqiuContent != 'null' ">
+                and laifangdengji.laifangdengji_suqiu_content like CONCAT('%',#{params.laifangdengjiSuqiuContent},'%')
+            </if>
+            <if test=" params.laifangdengjiShishiContent != '' and params.laifangdengjiShishiContent != null and params.laifangdengjiShishiContent != 'null' ">
+                and laifangdengji.laifangdengji_shishi_content like CONCAT('%',#{params.laifangdengjiShishiContent},'%')
+            </if>
+            <if test="params.laifangdengjiMudiTypes != null  and params.laifangdengjiMudiTypes != ''">
+                and laifangdengji.laifangdengji_mudi_types = #{params.laifangdengjiMudiTypes}
+            </if>
+
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(laifangdengji.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(laifangdengji.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.laifangdengjiChuliTypes != null  and params.laifangdengjiChuliTypes != ''">
+                and laifangdengji.laifangdengji_chuli_types = #{params.laifangdengjiChuliTypes}
+            </if>
+
+            <if test=" params.laifangdengjiChuliContent != '' and params.laifangdengjiChuliContent != null and params.laifangdengjiChuliContent != 'null' ">
+                and laifangdengji.laifangdengji_chuli_content like CONCAT('%',#{params.laifangdengjiChuliContent},'%')
+            </if>
+            <if test=" params.chuliTimeStart != '' and params.chuliTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(laifangdengji.chuli_time) >= UNIX_TIMESTAMP(#{params.chuliTimeStart}) ]]>
+            </if>
+            <if test=" params.chuliTimeEnd != '' and params.chuliTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(laifangdengji.chuli_time) <= UNIX_TIMESTAMP(#{params.chuliTimeEnd}) ]]>
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
